@@ -213,5 +213,5 @@ __marimo__/
 .vscode
 
 # Config files (keep example but ignore actual)
-config.yaml
-!config.example.yaml
+conf/
+!conf/config.example.yaml

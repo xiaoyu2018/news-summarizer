@@ -1,2 +1,203 @@
 # news-summarizer
-Collecting various industry news from designated information sources by AI, “news-summarizer” summarizes key points and sends them to you
+
+AI 新闻摘要生成器。从指定信息源收集行业新闻，AI 生成摘要并通过邮件发送。
+
+## 功能特性
+
+- **模块化架构**：Collector（收集器）、Processor（处理器）、Sender（发送器）均可插拔替换
+- **多领域支持**：可配置多个领域（科技、金融、医疗等），每个领域独立处理
+- **多实例支持**：同一类型可配置多个实例，敏感信息通过独立环境变量注入
+- **配置驱动**：YAML 配置文件 + Markdown 提示词，提示词与配置分离
+- **环境变量注入**：敏感信息使用 `${ENV_VAR_NAME}` 占位符，安全可靠
+
+## 项目结构
+
+```
+news-summarizer/
+├── conf/                      # 配置文件目录
+│   ├── config.yaml            # 配置文件（不提交）
+│   └── config.example.yaml    # 配置示例
+├── prompts/                   # 提示词目录
+│   └── tech.md               # 科技领域提示词
+├── .github/workflows/        # GitHub Actions
+│   └── daily_summary.yml     # 每日定时任务
+├── src/                      # 源代码
+│   ├── main.py               # 主入口
+│   ├── models.py             # 数据模型
+│   ├── config_loader.py      # 配置加载器
+│   ├── collectors/          # 收集器
+│   │   ├── base.py
+│   │   └── email_collector.py
+│   ├── processors/          # 处理器
+│   │   ├── base.py
+│   │   └── ai_processor.py
+│   ├── senders/             # 发送器
+│   │   ├── base.py
+│   │   └── email_sender.py
+│   └── utils/               # 工具类
+│       ├── logger.py
+│       └── html_cleaner.py
+├── pyproject.toml
+└── README.md
+```
+
+## 快速开始
+
+### 1. 克隆项目
+
+```bash
+git clone <repository-url>
+cd news-summarizer
+```
+
+### 2. 安装依赖
+
+```bash
+uv sync
+```
+
+### 3. 配置
+
+复制配置示例并修改：
+
+```bash
+cp conf/config.example.yaml conf/config.yaml
+```
+
+编辑 `conf/config.yaml`，配置以下内容：
+
+- **收集器**：IMAP 邮件配置（邮箱账号、密码、环境变量占位符）
+- **处理器**：AI API 配置（provider、api_base、api_key、model）
+- **发送器**：SMTP 配置（发件箱、收件人、密码）
+
+### 4. 设置环境变量
+
+根据配置文件中的占位符设置对应的环境变量：
+
+```bash
+# 邮箱密码
+export EMAIL_PASSWORD_PRIMARY="your-email-password"
+
+# AI API Key
+export DEEPSEEK_API_KEY="your-deepseek-api-key"
+
+# 发件箱密码
+export SENDER_PASSWORD="your-sender-password"
+```
+
+### 5. 运行
+
+```bash
+uv run python src/main.py
+```
+
+## 配置说明
+
+### 全局配置
+
+```yaml
+global:
+  timezone: "Asia/Shanghai"    # 时区
+  log_level: "INFO"            # 日志级别
+```
+
+### 领域配置
+
+```yaml
+domains:
+  - name: "tech"              # 领域名称
+    enabled: true             # 是否启用
+    category: "tech"          # 领域标识
+    collectors:               # 收集器列表
+      - name: "primary_email"
+        type: email
+        enabled: true
+        imap_server: "imap.gmail.com"
+        email_account: "sub@gmail.com"
+        email_password: "${EMAIL_PASSWORD_PRIMARY}"
+        mailbox: "INBOX"
+        mark_as_seen: true
+        time_range_days: 1
+    processor:                # 处理器
+      type: ai
+      enabled: true
+      provider: "deepseek"
+      api_base: "https://api.deepseek.com/v1"
+      api_key: "${DEEPSEEK_API_KEY}"
+      model: "deepseek-chat"
+      prompt_file: "prompts/tech.md"
+    sender:                   # 发送器
+      type: email
+      enabled: true
+      smtp_server: "smtp.gmail.com"
+      smtp_port: 465
+      sender_email: "sender@gmail.com"
+      sender_password: "${SENDER_PASSWORD}"
+      receiver_email: "daily@example.com"
+      subject_prefix: "科技日报"
+```
+
+### 环境变量占位符
+
+配置文件中的敏感信息使用 `${ENV_VAR_NAME}` 格式占位符，运行时会自动从环境变量读取。
+
+## 提示词配置
+
+提示词文件位于 `prompts/` 目录，使用 Markdown 格式。文件中的 `{combined_content}` 会被替换为收集到的新闻内容。
+
+示例 (`prompts/tech.md`)：
+
+```markdown
+你是一个科技新闻编辑。请根据以下新闻内容，整理一份今日科技日报。
+
+要求：
+- 只提取与AI应用、手机电脑数码产品相关的信息
+- 去除重复新闻
+- 每条新闻提供核心摘要
+
+新闻内容：
+{combined_content}
+```
+
+## GitHub Actions 定时任务
+
+项目配置了 GitHub Actions 定时任务，每日 UTC 0 点自动运行。
+
+在 GitHub 仓库设置中添加以下 Secrets：
+
+- `EMAIL_PASSWORD_PRIMARY`
+- `EMAIL_PASSWORD_SECONDARY`
+- `DEEPSEEK_API_KEY`
+- `SENDER_PASSWORD`
+
+## 扩展开发
+
+### 添加新的收集器
+
+1. 在 `src/collectors/` 创建新文件，继承 `Collector` 基类
+2. 实现 `collect()` 方法
+3. 在 `main.py` 的 `_create_collector()` 中注册
+
+### 添加新的处理器
+
+1. 在 `src/processors/` 创建新文件，继承 `Processor` 基类
+2. 实现 `process()` 方法
+3. 在 `main.py` 的 `_create_processor()` 中注册
+
+### 添加新的发送器
+
+1. 在 `src/senders/` 创建新文件，继承 `Sender` 基类
+2. 实现 `send()` 方法
+3. 在 `main.py` 的 `_create_sender()` 中注册
+
+## 技术栈
+
+- Python 3.10+
+- [uv](https://github.com/astral-sh/uv) - 依赖管理
+- [openai](https://github.com/openai/openai-python) - AI API 客户端
+- [html2text](https://github.com/aaronsw/html2text) - HTML 转文本
+- [PyYAML](https://github.com/yaml/pyyaml) - YAML 解析
+
+## License
+
+MIT

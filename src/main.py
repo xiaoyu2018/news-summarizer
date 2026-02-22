@@ -15,7 +15,7 @@ from src.utils.logger import setup_logger
 class NewsSummarizer:
     """Main controller for the news summarization process."""
 
-    def __init__(self, config_path: str = "config.yaml"):
+    def __init__(self, config_path: str = "conf/config.yaml"):
         """Initialize the news summarizer.
 
         Args:
@@ -233,9 +233,9 @@ class NewsSummarizer:
 
 def main():
     """Main entry point."""
-    config_path = Path("config.yaml")
+    config_path = Path("conf/config.yaml")
     if not config_path.exists():
-        config_path = Path(__file__).parent.parent / "config.yaml"
+        config_path = Path(__file__).parent.parent / "conf" / "config.yaml"
 
     summarizer = NewsSummarizer(str(config_path))
     summarizer.run()
