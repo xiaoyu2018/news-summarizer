@@ -211,3 +211,7 @@ __marimo__/
 
 # vscode
 .vscode
+
+# Config files (keep example but ignore actual)
+config.yaml
+!config.example.yaml
