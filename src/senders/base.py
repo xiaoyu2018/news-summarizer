@@ -32,8 +32,3 @@ class Sender(ABC):
             True if send was successful
         """
         pass
-
-    @property
-    def enabled(self) -> bool:
-        """Check if this sender is enabled."""
-        return self.config.get("enabled", True)

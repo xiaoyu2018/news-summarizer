@@ -32,8 +32,3 @@ class Processor(ABC):
             Processed summary text
         """
         pass
-
-    @property
-    def enabled(self) -> bool:
-        """Check if this processor is enabled."""
-        return self.config.get("enabled", True)

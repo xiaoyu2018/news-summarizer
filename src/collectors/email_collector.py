@@ -30,7 +30,6 @@ class EmailCollector(Collector):
         self.mailbox = config.get("mailbox", "INBOX")
         self.mark_as_seen = config.get("mark_as_seen", True)
         self.time_range_days = config.get("time_range_days", 1)
-        self.category = config.get("category", "tech")
 
     def collect(self) -> list[SourceItem]:
         """Collect unread emails from the configured mailbox.
@@ -132,7 +131,6 @@ class EmailCollector(Collector):
             url=urls[0] if urls else None,
             timestamp=timestamp,
             raw_data={"sender": sender, "subject": subject},
-            category=self.category,
         )
 
     @staticmethod

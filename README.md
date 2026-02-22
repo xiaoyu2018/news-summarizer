@@ -76,13 +76,13 @@ cp conf/config.example.yaml conf/config.yaml
 
 ```bash
 # 邮箱密码
-export EMAIL_PASSWORD_PRIMARY="your-email-password"
+export PASSWORD_EMAIL1="your-email-password"
 
 # AI API Key
-export DEEPSEEK_API_KEY="your-deepseek-api-key"
+export LLM1_API_KEY="your-deepseek-api-key"
 
 # 发件箱密码
-export SENDER_PASSWORD="your-sender-password"
+export EMAIL3_PASSWORD="your-sender-password"
 ```
 
 ### 5. 运行
@@ -106,33 +106,30 @@ global:
 ```yaml
 domains:
   - name: "tech"              # 领域名称
-    enabled: true             # 是否启用
-    category: "tech"          # 领域标识
     collectors:               # 收集器列表
-      - name: "primary_email"
+      - name: "EMAIL1"
         type: email
-        enabled: true
         imap_server: "imap.gmail.com"
         email_account: "sub@gmail.com"
-        email_password: "${EMAIL_PASSWORD_PRIMARY}"
+        email_password: "${PASSWORD_EMAIL1}"
         mailbox: "INBOX"
         mark_as_seen: true
         time_range_days: 1
     processor:                # 处理器
       type: ai
-      enabled: true
+      name: "LLM1"
       provider: "deepseek"
       api_base: "https://api.deepseek.com/v1"
-      api_key: "${DEEPSEEK_API_KEY}"
+      api_key: "${LLM1_API_KEY}"
       model: "deepseek-chat"
       prompt_file: "prompts/tech.md"
     sender:                   # 发送器
       type: email
-      enabled: true
+      name: "EMAIL2"
       smtp_server: "smtp.gmail.com"
       smtp_port: 465
       sender_email: "sender@gmail.com"
-      sender_password: "${SENDER_PASSWORD}"
+      sender_password: "${EMAIL3_PASSWORD}"
       receiver_email: "daily@example.com"
       subject_prefix: "科技日报"
 ```
@@ -165,10 +162,9 @@ domains:
 
 在 GitHub 仓库设置中添加以下 Secrets：
 
-- `EMAIL_PASSWORD_PRIMARY`
-- `EMAIL_PASSWORD_SECONDARY`
-- `DEEPSEEK_API_KEY`
-- `SENDER_PASSWORD`
+- `PASSWORD_EMAIL1`
+- `LLM1_API_KEY`
+- `EMAIL3_PASSWORD`
 
 ## 扩展开发
 

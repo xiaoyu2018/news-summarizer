@@ -26,7 +26,7 @@ class NewsSummarizer:
         self.config: dict | None = None
 
     def run(self) -> None:
-        """Run the news summarization process for all enabled domains."""
+        """Run the news summarization process for all domains."""
         self.logger.info("Starting news-summarizer")
 
         try:
@@ -41,10 +41,6 @@ class NewsSummarizer:
             return
 
         for domain in domains:
-            if not domain.get("enabled", True):
-                self.logger.info(f"Domain '{domain.get('name')}' is disabled, skipping")
-                continue
-
             self._process_domain(domain)
 
         self.logger.info("News summarization completed")
@@ -100,9 +96,6 @@ class NewsSummarizer:
         all_items: list[SourceItem] = []
 
         for collector_config in collectors_config:
-            if not collector_config.get("enabled", True):
-                continue
-
             collector = self._create_collector(collector_config)
             if collector is None:
                 continue
@@ -148,8 +141,8 @@ class NewsSummarizer:
             Processed content or None
         """
         processor_config = domain.get("processor", {})
-        if not processor_config or not processor_config.get("enabled", True):
-            self.logger.warning("No enabled processor configured")
+        if not processor_config:
+            self.logger.warning("No processor configured")
             return None
 
         processor = self._create_processor(processor_config)
@@ -191,8 +184,8 @@ class NewsSummarizer:
             True if send was successful
         """
         sender_config = domain.get("sender", {})
-        if not sender_config or not sender_config.get("enabled", True):
-            self.logger.warning("No enabled sender configured")
+        if not sender_config:
+            self.logger.warning("No sender configured")
             return False
 
         sender = self._create_sender(sender_config)

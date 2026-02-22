@@ -17,7 +17,6 @@ domains:
         time_range_days: 1
       - name: "EMAIL2"
         type: email
-        enabled: false
         imap_server: "imap.gmail.com"
         email_account: "sub2@gmail.com"
         email_password: "${PASSWORD_EMAIL2}"

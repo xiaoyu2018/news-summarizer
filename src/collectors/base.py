@@ -31,11 +31,6 @@ class Collector(ABC):
         pass
 
     @property
-    def enabled(self) -> bool:
-        """Check if this collector is enabled."""
-        return self.config.get("enabled", True)
-
-    @property
     def source_type(self) -> str:
         """Get the source type identifier."""
         return self.config.get("type", "unknown")
