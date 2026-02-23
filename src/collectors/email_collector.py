@@ -25,6 +25,7 @@ class EmailCollector(Collector):
         """
         super().__init__(config, name)
         self.imap_server = config.get("imap_server", "imap.gmail.com")
+        self.imap_port = config.get("imap_port", 993)
         self.email_account = config.get("email_account", "")
         self.email_password = config.get("email_password", "")
         self.mailbox = config.get("mailbox", "INBOX")
@@ -40,37 +41,47 @@ class EmailCollector(Collector):
         self.logger.info(f"Starting email collection from {self.email_account}")
 
         items: list[SourceItem] = []
+        mail = None
 
         try:
-            with self._connect() as mail:
-                status, _ = mail.select(self.mailbox)
-                if status != "OK":
-                    self.logger.error(
-                        f"Failed to select mailbox '{self.mailbox}': {status}"
-                    )
-                    return items
+            mail = self._connect()
 
-                search_criteria = self._build_search_criteria()
-                self.logger.debug(f"Search criteria: {search_criteria}")
+            # 使用 select + search 获取未读邮件
+            status, msg_count = mail.select(self.mailbox)
+            print(f"[DEBUG] Select result: status={status}, count={msg_count}")
+            if status != "OK":
+                self.logger.error(f"Failed to select mailbox: {status}")
+                return items
 
-                _, message_ids = mail.search(None, search_criteria)
-                message_id_list = message_ids[0].split()
+            self.logger.info(f"Selected mailbox, {msg_count[0]} messages")
 
-                self.logger.info(f"Found {len(message_id_list)} emails to process")
+            search_criteria = self._build_search_criteria()
+            _, message_ids = mail.search(None, search_criteria)
+            message_id_list = message_ids[0].split()
 
-                for msg_id in message_id_list:
-                    try:
-                        item = self._process_email(mail, msg_id)
-                        if item:
-                            items.append(item)
+            self.logger.info(f"Found {len(message_id_list)} emails to process")
 
-                            if not self.mark_as_seen:
-                                mail.store(msg_id, "-FLAGS", "\\Seen")
-                    except Exception as e:
-                        self.logger.error(f"Error processing email {msg_id}: {e}")
+            for msg_id in message_id_list:
+                try:
+                    item = self._process_email(mail, msg_id)
+                    if item:
+                        items.append(item)
+
+                        if not self.mark_as_seen:
+                            mail.store(msg_id, "+FLAGS", "\\Seen")
+                except Exception as e:
+                    self.logger.error(f"Error processing email {msg_id}: {e}")
 
         except Exception as e:
             self.logger.error(f"Failed to collect emails: {e}")
+
+        finally:
+            if mail:
+                try:
+                    mail.close()
+                    mail.logout()
+                except Exception:
+                    pass
 
         self.logger.info(f"Collected {len(items)} items from email")
         return items
@@ -81,10 +92,82 @@ class EmailCollector(Collector):
         Returns:
             IMAP connection
         """
-        self.logger.debug(f"Connecting to {self.imap_server}")
-        mail = imaplib.IMAP4_SSL(self.imap_server)
-        mail.login(self.email_account, self.email_password)
+        print(
+            f"[DEBUG] Connecting to {self.imap_server}:{self.imap_port} with account {self.email_account}"
+        )
+
+        mail = imaplib.IMAP4_SSL(self.imap_server, self.imap_port)
+        print(f"[DEBUG] IMAP SSL connection established")
+
+        login_result = mail.login(self.email_account, self.email_password)
+        print(f"[DEBUG] Login result: {login_result}")
+
+        # 163邮箱需要发送ID命令才能执行SELECT
+        try:
+            imaplib.Commands["ID"] = ("AUTH",)
+            args = (
+                "name",
+                self.email_account,
+                "contact",
+                self.email_account,
+                "version",
+                "1.0.0",
+                "vendor",
+                "news-summarizer",
+            )
+            cmd = '("' + '" "'.join(args) + '")'
+            typ, dat = mail._simple_command("ID", cmd)
+            print(f"[DEBUG] ID command result: typ={typ}, dat={dat}")
+        except Exception as e:
+            print(f"[DEBUG] ID command failed (optional): {e}")
+
         return mail
+
+    def _get_unread_msg_ids(self, mail: imaplib.IMAP4_SSL) -> list:
+        """通过遍历所有邮件获取未读邮件ID"""
+        try:
+            # 获取邮件总数
+            status, data = mail.status(self.mailbox, "(MESSAGES)")
+            if status != "OK":
+                print(f"[DEBUG] Failed to get message count: {status}")
+                return []
+
+            import re
+
+            match = re.search(r"MESSAGES (\d+)", data[0].decode())
+            total = int(match.group(1)) if match else 0
+            print(f"[DEBUG] Total messages: {total}")
+
+            if total == 0:
+                return []
+
+            # 从后往前遍历最近30封，找未读邮件
+            unread_ids = []
+            start = max(1, total - 29)
+            for msg_num in range(total, start - 1, -1):
+                try:
+                    status, flags = mail.fetch(str(msg_num), "(FLAGS)")
+                    if status == "OK" and flags:
+                        flags_str = (
+                            flags[0][0].decode()
+                            if isinstance(flags[0][0], bytes)
+                            else str(flags[0][0])
+                        )
+                        print(f"[DEBUG] Msg {msg_num} flags: {flags_str}")
+                        if "\\Seen" not in flags_str and "Seen" not in flags_str:
+                            unread_ids.append(str(msg_num).encode())
+                            if len(unread_ids) >= 10:
+                                break
+                except Exception as e:
+                    print(f"[DEBUG] Error fetching msg {msg_num}: {e}")
+                    continue
+
+            print(f"[DEBUG] Found {len(unread_ids)} unread messages")
+            return unread_ids
+
+        except Exception as e:
+            print(f"[DEBUG] Error: {e}")
+            return []
 
     def _build_search_criteria(self) -> str:
         """Build IMAP search criteria.

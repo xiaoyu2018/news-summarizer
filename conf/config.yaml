@@ -10,6 +10,7 @@ domains:
       - name: "EMAIL1"
         type: email
         imap_server: "imap.163.com"
+        imap_port: 993
         email_account: "${EMAIL1_ACCOUNT}"
         email_password: "${EMAIL1_PASSWORD}"
         mailbox: "INBOX"
