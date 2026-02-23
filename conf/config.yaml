@@ -26,7 +26,7 @@ domains:
     sender:
       type: email
       name: "EMAIL1"
-      smtp_server: "smtp.gmail.com"
+      smtp_server: "smtp.163.com"
       smtp_port: 465
       sender_email: "${EMAIL1_ACCOUNT}"
       sender_password: "${EMAIL1_PASSWORD}"

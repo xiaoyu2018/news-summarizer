@@ -43,7 +43,13 @@ class EmailCollector(Collector):
 
         try:
             with self._connect() as mail:
-                mail.select(self.mailbox)
+                status, _ = mail.select(self.mailbox)
+                if status != "OK":
+                    self.logger.error(
+                        f"Failed to select mailbox '{self.mailbox}': {status}"
+                    )
+                    return items
+
                 search_criteria = self._build_search_criteria()
                 self.logger.debug(f"Search criteria: {search_criteria}")
 
