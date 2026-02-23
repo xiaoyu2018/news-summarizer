@@ -23,4 +23,4 @@ jobs:
           EMAIL1_PASSWORD: ${{ secrets.EMAIL1_PASSWORD }}
           LLM1_API_KEY: ${{ secrets.LLM1_API_KEY }}
           RECIEVE_ACCOUNT: ${{ secrets.RECIEVE_ACCOUNT }}
-        run: uv run python src/main.py
+        run: uv run python -m src.main
