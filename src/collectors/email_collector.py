@@ -69,10 +69,10 @@ class EmailCollector(Collector):
 
                         if not self.mark_as_seen:
                             mail.store(msg_id, "+FLAGS", "\\Seen")
-                except Exception as e:
+                except (imaplib.IMAP4.error, email.message.MessageError) as e:
                     self.logger.error(f"Error processing email {msg_id}: {e}")
 
-        except Exception as e:
+        except imaplib.IMAP4.error as e:
             self.logger.error(f"Failed to collect emails: {e}")
 
         finally:
@@ -80,8 +80,8 @@ class EmailCollector(Collector):
                 try:
                     mail.close()
                     mail.logout()
-                except Exception:
-                    pass
+                except imaplib.IMAP4.error as e:
+                    self.logger.warning(f"Error closing mail connection: {e}")
 
         self.logger.info(f"Collected {len(items)} items from email")
         return items
@@ -93,7 +93,7 @@ class EmailCollector(Collector):
             IMAP connection
         """
         mail = imaplib.IMAP4_SSL(self.imap_server, self.imap_port)
-        
+
         try:
             mail.login(self.email_account, self.email_password)
         except imaplib.IMAP4.error as e:
@@ -152,12 +152,12 @@ class EmailCollector(Collector):
                             unread_ids.append(str(msg_num).encode())
                             if len(unread_ids) >= 10:
                                 break
-                except Exception as e:
+                except imaplib.IMAP4.error:
                     continue
 
             return unread_ids
 
-        except Exception as e:
+        except imaplib.IMAP4.error:
             return []
 
     def _build_search_criteria(self) -> str:
@@ -298,7 +298,7 @@ class EmailCollector(Collector):
             from email.utils import parsedate_to_datetime
 
             return parsedate_to_datetime(date_str)
-        except Exception:
+        except (ValueError, TypeError):
             return None
 
     def _extract_urls(self, content: str) -> list[str]:

@@ -1,5 +1,8 @@
 from datetime import datetime
 
+import imaplib
+import smtplib
+from openai import APIConnectionError, APIError, RateLimitError
 
 from src.collectors.email_collector import EmailCollector
 from src.config_loader import ConfigLoader
@@ -30,7 +33,7 @@ class NewsSummarizer:
             self.config = self._load_config()
         except FileNotFoundError as e:
             self.logger.error(f"Configuration file not found: {e}")
-            return 
+            return
 
         domains = self.config.get("domains", [])
         if not domains:
@@ -73,7 +76,13 @@ class NewsSummarizer:
 
             self._send_report(processed_content, domain)
 
-        except Exception as e:
+        except (
+            imaplib.IMAP4.error,
+            smtplib.SMTPException,
+            KeyError,
+            TypeError,
+            AttributeError,
+        ) as e:
             self.logger.error(f"Error processing domain {domain_name}: {e}")
 
     def _collect_items(self, domain: dict) -> list[SourceItem]:
@@ -104,7 +113,7 @@ class NewsSummarizer:
                 self.logger.info(
                     f"Collector {collector.name} collected {len(items)} items"
                 )
-            except Exception as e:
+            except imaplib.IMAP4.error as e:
                 self.logger.error(f"Collector {collector.name} failed: {e}")
 
         return all_items
@@ -148,7 +157,7 @@ class NewsSummarizer:
 
         try:
             return processor.process(items)
-        except Exception as e:
+        except (APIError, APIConnectionError, RateLimitError) as e:
             self.logger.error(f"Processing failed: {e}")
             return None
 
@@ -198,7 +207,7 @@ class NewsSummarizer:
             if success:
                 self.logger.info(f"Report sent successfully: {subject}")
             return success
-        except Exception as e:
+        except smtplib.SMTPException as e:
             self.logger.error(f"Failed to send report: {e}")
             return False
 

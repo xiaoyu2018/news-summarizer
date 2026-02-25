@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Any
 
-from openai import OpenAI
+from openai import APIConnectionError, APIError, OpenAI, RateLimitError
 
 from src.models import SourceItem
 from src.processors.base import Processor
@@ -74,7 +74,7 @@ class AIProcessor(Processor):
             self.logger.info("AI processing completed successfully")
             return summary or "生成摘要失败。"
 
-        except Exception as e:
+        except (APIError, APIConnectionError, RateLimitError) as e:
             self.logger.error(f"AI processing failed: {e}")
             return f"AI处理失败: {str(e)}"
 
@@ -101,9 +101,16 @@ class AIProcessor(Processor):
             self._prompt_template = self._get_default_prompt()
             return self._prompt_template
 
-        self._prompt_template = prompt_path.read_text(encoding="utf-8")
-        self.logger.debug(f"Loaded prompt from {prompt_path}")
-        return self._prompt_template
+        try:
+            self._prompt_template = prompt_path.read_text(encoding="utf-8")
+            self.logger.debug(f"Loaded prompt from {prompt_path}")
+            return self._prompt_template
+        except OSError as e:
+            self.logger.warning(
+                f"Failed to read prompt file: {prompt_path}, using default: {e}"
+            )
+            self._prompt_template = self._get_default_prompt()
+            return self._prompt_template
 
     @staticmethod
     def _combine_items(items: list[SourceItem]) -> str:

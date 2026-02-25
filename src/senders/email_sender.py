@@ -68,7 +68,7 @@ class EmailSender(Sender):
             self.logger.info("Email sent successfully")
             return True
 
-        except Exception as e:
+        except smtplib.SMTPException as e:
             self.logger.error(f"Failed to send email: {e}")
             return False
 
