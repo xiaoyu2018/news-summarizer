@@ -192,12 +192,9 @@ domains:
 3. 在 `main.py` 的 `_create_sender()` 中注册
 
 ## TODO
-- [ ] 优化collector url提取功能
+- [ ] 优化SourceItem结构（urls），统一解析方式（to_str、to_dict...）
 - [ ] 改进tech.md提示词，优化生成内容（分类总结、优化信息展示模式）
 - [ ] 修复ai_processor偶尔信息提取失败问题
-
-## ROADMAP
-### 2026-02-25
 - [x] 优化日志记录模式
 
 ## License
