@@ -42,7 +42,6 @@ class EmailCollector(Collector):
 
         items: list[SourceItem] = []
         mail = None
-
         try:
             mail = self._connect()
 
@@ -66,8 +65,7 @@ class EmailCollector(Collector):
                     item = self._process_email(mail, msg_id)
                     if item:
                         items.append(item)
-
-                        if not self.mark_as_seen:
+                        if self.mark_as_seen:
                             mail.store(msg_id, "+FLAGS", "\\Seen")
                 except (imaplib.IMAP4.error, email.message.MessageError) as e:
                     self.logger.exception(f"Error processing email {msg_id}: {e}")
@@ -120,46 +118,6 @@ class EmailCollector(Collector):
 
         return mail
 
-    def _get_unread_msg_ids(self, mail: imaplib.IMAP4_SSL) -> list:
-        """通过遍历所有邮件获取未读邮件ID"""
-        try:
-            # 获取邮件总数
-            status, data = mail.status(self.mailbox, "(MESSAGES)")
-            if status != "OK":
-                return []
-
-            import re
-
-            match = re.search(r"MESSAGES (\d+)", data[0].decode())
-            total = int(match.group(1)) if match else 0
-
-            if total == 0:
-                return []
-
-            # 从后往前遍历最近30封，找未读邮件
-            unread_ids = []
-            start = max(1, total - 29)
-            for msg_num in range(total, start - 1, -1):
-                try:
-                    status, flags = mail.fetch(str(msg_num), "(FLAGS)")
-                    if status == "OK" and flags:
-                        flags_str = (
-                            flags[0][0].decode()
-                            if isinstance(flags[0][0], bytes)
-                            else str(flags[0][0])
-                        )
-                        if "\\Seen" not in flags_str and "Seen" not in flags_str:
-                            unread_ids.append(str(msg_num).encode())
-                            if len(unread_ids) >= 10:
-                                break
-                except imaplib.IMAP4.error:
-                    continue
-
-            return unread_ids
-
-        except imaplib.IMAP4.error:
-            return []
-
     def _build_search_criteria(self) -> str:
         """Build IMAP search criteria.
 
@@ -169,7 +127,7 @@ class EmailCollector(Collector):
         since_date = (datetime.now() - timedelta(days=self.time_range_days)).strftime(
             "%d-%b-%Y"
         )
-        return f'(UNSEEN SINCE "{since_date}")'
+        return f'(SINCE "{since_date}")'
 
     def _process_email(
         self, mail: imaplib.IMAP4_SSL, msg_id: bytes
@@ -183,7 +141,7 @@ class EmailCollector(Collector):
         Returns:
             SourceItem or None if processing fails
         """
-        _, msg_data = mail.fetch(msg_id, "(RFC822)")
+        _, msg_data = mail.fetch(msg_id, "BODY.PEEK[]")
 
         if not msg_data or not msg_data[0]:
             return None
@@ -210,7 +168,7 @@ class EmailCollector(Collector):
             content=content,
             urls=urls,
             timestamp=timestamp,
-            raw_data=msg,
+            raw_data=None,
         )
 
     @staticmethod

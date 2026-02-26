@@ -53,7 +53,7 @@ class AIProcessor(Processor):
         prompt_template = self._load_prompt()
         combined_content = self._combine_items(items)
         prompt = prompt_template.replace("{combined_content}", combined_content)
-
+        print(prompt)
         self.logger.debug(f"Prompt length: {len(prompt)} characters")
 
         try:
