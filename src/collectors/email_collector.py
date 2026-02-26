@@ -208,9 +208,9 @@ class EmailCollector(Collector):
             source_id=source_id,
             title=subject,
             content=content,
-            url=urls[0] if urls else None,
+            urls=urls,
             timestamp=timestamp,
-            raw_data={"sender": sender, "subject": subject},
+            raw_data=msg,
         )
 
     @staticmethod

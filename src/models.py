@@ -14,7 +14,7 @@ class SourceItem:
         source_id: Unique identifier for this source
         title: Title of the content
         content: Cleaned text content
-        url: Original URL link (optional)
+        url: Original URL links (optional)
         timestamp: Publication timestamp (optional)
         raw_data: Original raw data (optional)
     """
@@ -23,7 +23,7 @@ class SourceItem:
     source_id: str
     title: str
     content: str
-    url: Optional[str] = None
+    urls: Optional[list] = None
     timestamp: Optional[datetime] = None
     raw_data: Optional[Any] = None
 
