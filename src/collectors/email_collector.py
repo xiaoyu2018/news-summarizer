@@ -127,7 +127,7 @@ class EmailCollector(Collector):
         since_date = (datetime.now() - timedelta(days=self.time_range_days)).strftime(
             "%d-%b-%Y"
         )
-        return f'(SINCE "{since_date}")'
+        return f'(UNSEEN SINCE "{since_date}")'
 
     def _process_email(
         self, mail: imaplib.IMAP4_SSL, msg_id: bytes
