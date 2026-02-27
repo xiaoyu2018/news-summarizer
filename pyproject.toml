@@ -1,5 +1,5 @@
 [project]
-name = "news-summarizer"
+name = "Synapulse"
 version = "0.1.0"
 description = "Collecting various industry news from designated information sources by AI, summarizes key points and sends them to you."
 readme = "README.md"
