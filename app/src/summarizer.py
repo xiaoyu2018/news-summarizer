@@ -4,18 +4,18 @@ import imaplib
 import smtplib
 from openai import APIConnectionError, APIError, RateLimitError
 
-from src.collectors.email_collector import EmailCollector
-from src.config_loader import ConfigLoader
-from src.models import SourceItem
-from src.processors.ai_processor import AIProcessor
-from src.senders.email_sender import EmailSender
-from src.utils.logger import setup_logger
+from app.src.collectors.email_collector import EmailCollector
+from app.src.config_loader import ConfigLoader
+from app.src.models import SourceItem
+from app.src.processors.ai_processor import AIProcessor
+from app.src.senders.email_sender import EmailSender
+from app.src.utils.logger import setup_logger
 
 
 class NewsSummarizer:
     """Main controller for the news summarization process."""
 
-    def __init__(self, config_path: str = "conf/config.yaml"):
+    def __init__(self, config_path: str = "app/conf/config.yaml"):
         """Initialize the news summarizer.
 
         Args:

@@ -8,9 +8,9 @@ from typing import Any
 
 import imaplib
 
-from src.collectors.base import Collector
-from src.models import SourceItem
-from src.utils.html_cleaner import HTMLCleaner
+from app.src.collectors.base import Collector
+from app.src.models import SourceItem
+from app.src.utils.html_cleaner import HTMLCleaner
 
 
 class EmailCollector(Collector):

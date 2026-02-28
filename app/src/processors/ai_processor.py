@@ -5,8 +5,8 @@ from typing import Any
 
 from openai import APIConnectionError, APIError, OpenAI, RateLimitError
 
-from src.models import SourceItem
-from src.processors.base import Processor
+from app.src.models import SourceItem
+from app.src.processors.base import Processor
 
 
 class AIProcessor(Processor):

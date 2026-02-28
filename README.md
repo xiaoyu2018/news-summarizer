@@ -1,114 +1,120 @@
+[English](./README.md) | [中文](./assets/docs/README_zh.md)
+
 # Synapulse
 
-**Synapulse** 连接您与行业前沿。
+**Synapulse** connects you with industry frontiers.
 
-- 收集：从指定的信息源（邮箱简报、X账号、Reddit等）自动抓取原始信息
-- 分析：AI 智能筛选、去重、提炼核心观点，生成结构化摘要
-- 发送：按预先设定的时间（每日/每周）和渠道（邮件/飞书等）准时送达
+- **Collect**: Automatically gather raw information from designated sources (email newsletters, X accounts, Reddit, etc.)
+- **Analyze**: AI-powered filtering, deduplication, and core insight extraction to generate structured summaries
+- **Deliver**: Send to your preferred channel (email, Feishu, etc.) on a scheduled basis (daily/weekly)
 
 
-## 功能特性
+## Features
 
-- **模块化架构**：Collector（收集器）、Processor（处理器）、Sender（发送器）均可插拔替换
-- **多领域支持**：可配置多个领域（科技、金融、医疗等），每个领域独立处理
-- **多实例支持**：同一类型可配置多个实例，敏感信息通过独立环境变量注入
-- **配置驱动**：YAML 配置文件 + Markdown 提示词，提示词与配置分离
-- **环境变量注入**：敏感信息使用 `${ENV_VAR_NAME}` 占位符，安全可靠
+- **Modular Architecture**: Pluggable Collectors, Processors, and Senders
+- **Multi-domain Support**: Configure multiple domains (tech, finance, healthcare, etc.) with independent processing
+- **Multi-instance Support**: Multiple instances of the same type, with sensitive info via separate environment variables
+- **Configuration-driven**: YAML config + Markdown prompts, separated from code
+- **Environment Variable Injection**: Sensitive info uses `${ENV_VAR_NAME}` placeholders for security
 
-## 项目结构
+## Project Structure
 
 ```
-news-summarizer/
-├── conf/                      # 配置文件目录
-│   ├── config.yaml            # 配置文件（不提交）
-│   └── config.example.yaml    # 配置示例
-├── prompts/                   # 提示词目录
-│   └── tech.md               # 科技领域提示词
-├── .github/workflows/        # GitHub Actions
-│   └── daily_summary.yml     # 每日定时任务
-├── src/                      # 源代码
-│   ├── main.py               # 主入口
-│   ├── models.py             # 数据模型
-│   ├── config_loader.py      # 配置加载器
-│   ├── collectors/          # 收集器
-│   │   ├── base.py
-│   │   └── email_collector.py
-│   ├── processors/          # 处理器
-│   │   ├── base.py
-│   │   └── ai_processor.py
-│   ├── senders/             # 发送器
-│   │   ├── base.py
-│   │   └── email_sender.py
-│   └── utils/               # 工具类
-│       ├── logger.py
-│       └── html_cleaner.py
+Synapulse/
+├── app/                        # Application code directory
+│   ├── conf/                   # Configuration files
+│   │   ├── config.yaml         # Config file (not committed)
+│   │   └── config.example.yaml # Config example
+│   ├── prompts/                # Prompt templates
+│   │   └── tech.md             # Tech domain prompt
+│   ├── src/                    # Source code
+│   │   ├── main.py             # Main entry point
+│   │   ├── models.py           # Data models
+│   │   ├── config_loader.py    # Config loader
+│   │   ├── summarizer.py       # Main controller
+│   │   ├── collectors/         # Collectors
+│   │   │   ├── base.py
+│   │   │   └── email_collector.py
+│   │   ├── processors/         # Processors
+│   │   │   ├── base.py
+│   │   │   └── ai_processor.py
+│   │   ├── senders/            # Senders
+│   │   │   ├── base.py
+│   │   │   └── email_sender.py
+│   │   └── utils/              # Utilities
+│   │       ├── logger.py
+│   │       └── html_cleaner.py
+│   └── tests/                  # Tests
+│       └── test_email_collector.py
+├── .github/workflows/           # GitHub Actions
+│   └── daily_summary.yml       # Daily scheduled task
 ├── pyproject.toml
 └── README.md
 ```
 
-## 快速开始
+## Quick Start
 
-### 1. 克隆项目
+### 1. Clone the Project
 
 ```bash
 git clone <repository-url>
-cd news-summarizer
+cd synapulse
 ```
 
-### 2. 安装依赖
+### 2. Install Dependencies
 
 ```bash
 uv sync
 ```
 
-### 3. 配置
+### 3. Configuration
 
-编辑 `conf/config.yaml`，配置以下内容：
+Edit `app/conf/config.yaml` and configure:
 
-- **收集器**：IMAP 邮件配置（邮箱账号、密码、环境变量占位符）
-- **处理器**：AI API 配置（provider、api_base、api_key、model）
-- **发送器**：SMTP 配置（发件箱、收件人、密码）
+- **Collector**: IMAP email settings (account, password, env var placeholders)
+- **Processor**: AI API settings (provider, api_base, api_key, model)
+- **Sender**: SMTP settings (sender, receiver, password)
 
-### 4. 设置环境变量
+### 4. Set Environment Variables
 
-根据配置文件中的占位符设置对应的环境变量：
+Set corresponding environment variables based on placeholders in the config:
 
 ```bash
-# 邮箱账号和密码
+# Email account and password
 export EMAIL1_ACCOUNT="your-email@gmail.com"
 export EMAIL1_PASSWORD="your-email-password"
 
 # AI API Key
 export LLM1_API_KEY="your-deepseek-api-key"
 
-# 发件箱和收件人
+# Sender and receiver
 export EMAIL3_ACCOUNT="sender@gmail.com"
 export EMAIL3_PASSWORD="your-sender-password"
 export RECEIVER_EMAIL="receiver@example.com"
 ```
 
-### 5. 运行
+### 5. Run
 
 ```bash
-uv run python src/main.py
+uv run python -m app.src.main
 ```
 
-## 配置说明
+## Configuration Guide
 
-### 全局配置
+### Global Config
 
 ```yaml
 global:
-  timezone: "Asia/Shanghai"    # 时区
-  log_level: "INFO"            # 日志级别
+  timezone: "Asia/Shanghai"
+  log_level: "INFO"
 ```
 
-### 领域配置
+### Domain Config
 
 ```yaml
 domains:
-  - name: "tech"              # 领域名称
-    collectors:               # 收集器列表
+  - name: "tech"              # Domain name
+    collectors:               # Collector list
       - name: "EMAIL1"
         type: email
         imap_server: "imap.gmail.com"
@@ -117,15 +123,15 @@ domains:
         mailbox: "INBOX"
         mark_as_seen: true
         time_range_days: 1
-    processor:                # 处理器
+    processor:                # Processor
       type: ai
       name: "LLM1"
       provider: "deepseek"
       api_base: "https://api.deepseek.com/v1"
       api_key: "${LLM1_API_KEY}"
       model: "deepseek-chat"
-      prompt_file: "prompts/tech.md"
-    sender:                   # 发送器
+      prompt_file: "app/prompts/tech.md"
+    sender:                   # Sender
       type: email
       name: "EMAIL2"
       smtp_server: "smtp.gmail.com"
@@ -133,36 +139,36 @@ domains:
       sender_email: "sender@gmail.com"
       sender_password: "${EMAIL3_PASSWORD}"
       receiver_email: "daily@example.com"
-      subject_prefix: "科技日报"
+      subject_prefix: "Tech Daily"
 ```
 
-### 环境变量占位符
+### Environment Variable Placeholders
 
-配置文件中的敏感信息使用 `${ENV_VAR_NAME}` 格式占位符，运行时会自动从环境变量读取。
+Sensitive info in config uses `${ENV_VAR_NAME}` format placeholders, resolved at runtime from environment variables.
 
-## 提示词配置
+## Prompt Configuration
 
-提示词文件位于 `prompts/` 目录，使用 Markdown 格式。文件中的 `{combined_content}` 会被替换为收集到的新闻内容。
+Prompt templates are in `app/prompts/` directory, in Markdown format. `{combined_content}` in the template will be replaced with collected news content.
 
-示例 (`prompts/tech.md`)：
+Example (`app/prompts/tech.md`):
 
 ```markdown
-你是一个科技新闻编辑。请根据以下新闻内容，整理一份今日科技日报。
+You are a tech news editor. Please organize today's tech news summary based on the following content.
 
-要求：
-- 只提取与AI应用、手机电脑数码产品相关的信息
-- 去除重复新闻
-- 每条新闻提供核心摘要
+Requirements:
+- Only extract information related to AI applications, mobile devices, and digital products
+- Remove duplicate news
+- Provide core summary for each news item
 
-新闻内容：
+News Content:
 {combined_content}
 ```
 
-## GitHub Actions 定时任务
+## GitHub Actions Scheduled Task
 
-项目配置了 GitHub Actions 定时任务，每日 UTC 0 点自动运行。
+The project has GitHub Actions configured to run daily at UTC 0.
 
-在 GitHub 仓库设置中添加以下 Secrets：
+Add the following Secrets in GitHub repository settings:
 
 - `EMAIL1_ACCOUNT`
 - `EMAIL1_PASSWORD`
@@ -171,31 +177,38 @@ domains:
 - `EMAIL3_PASSWORD`
 - `RECEIVER_EMAIL`
 
-## 扩展开发
+## Extension Development
 
-### 添加新的收集器
+### Add New Collector
 
-1. 在 `src/collectors/` 创建新文件，继承 `Collector` 基类
-2. 实现 `collect()` 方法
-3. 在 `main.py` 的 `_create_collector()` 中注册
+1. Create a new file in `app/src/collectors/`, inherit from `Collector` base class
+2. Implement `collect()` method
+3. Register in `app/src/summarizer.py` `_create_collector()`
 
-### 添加新的处理器
+### Add New Processor
 
-1. 在 `src/processors/` 创建新文件，继承 `Processor` 基类
-2. 实现 `process()` 方法
-3. 在 `main.py` 的 `_create_processor()` 中注册
+1. Create a new file in `app/src/processors/`, inherit from `Processor` base class
+2. Implement `process()` method
+3. Register in `app/src/summarizer.py` `_create_processor()`
 
-### 添加新的发送器
+### Add New Sender
 
-1. 在 `src/senders/` 创建新文件，继承 `Sender` 基类
-2. 实现 `send()` 方法
-3. 在 `main.py` 的 `_create_sender()` 中注册
+1. Create a new file in `app/src/senders/`, inherit from `Sender` base class
+2. Implement `send()` method
+3. Register in `app/src/summarizer.py` `_create_sender()`
+
+## Sponsor
+
+If you find this project helpful, please scan to sponsor!
+
+<img src="assets/sponsor-wechat.png" width="200" alt="WeChat Sponsor QR Code">
 
 ## TODO
-- [ ] 优化SourceItem结构（urls），统一解析方式（to_str、to_dict...）
-- [ ] 改进tech.md提示词，优化生成内容（分类总结、优化信息展示模式）
-- [ ] 修复ai_processor偶尔信息提取失败问题
-- [x] 优化日志记录模式
+
+- [ ] Optimize SourceItem structure (urls), unify parsing methods (to_str, to_dict...)
+- [ ] Improve tech.md prompt, optimize generated content (categorized summary, better info display)
+- [ ] Fix occasional info extraction failure in ai_processor
+- [x] Optimize logging pattern
 
 ## License
 

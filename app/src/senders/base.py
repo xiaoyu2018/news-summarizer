@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from src.utils.logger import get_logger
+from app.src.utils.logger import get_logger
 
 
 class Sender(ABC):

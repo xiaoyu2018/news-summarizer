@@ -5,7 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Any
 
-from src.senders.base import Sender
+from app.src.senders.base import Sender
 
 
 class EmailSender(Sender):

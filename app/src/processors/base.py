@@ -3,8 +3,8 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from src.models import SourceItem
-from src.utils.logger import get_logger
+from app.src.models import SourceItem
+from app.src.utils.logger import get_logger
 
 
 class Processor(ABC):
