@@ -1,5 +1,3 @@
-[English](./README.md) | 中文
-
 # Synapulse
 
 **Synapulse** 连接您与行业前沿。
@@ -58,7 +56,7 @@ Synapulse/
 
 ```bash
 git clone <repository-url>
-cd news-summarizer
+cd synapulse
 ```
 
 ### 2. 安装依赖
@@ -201,7 +199,7 @@ domains:
 
 如果你觉得这个项目对你有帮助，欢迎扫码赞助！
 
-<img src="../sponsor-wechat.png" width="200" alt="微信赞助二维码">
+<img src="assets/sponsor-wechat.png" width="200" alt="微信赞助二维码">
 
 ## TODO
 
