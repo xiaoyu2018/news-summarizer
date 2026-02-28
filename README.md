@@ -1,4 +1,5 @@
-[English](./README.md) | [中文](./assets/docs/README_zh.md)
+- [🇨🇳 简体中文](README.zh-CN.md)
+- [🇺🇸 English](README.md)
 
 # Synapulse
 

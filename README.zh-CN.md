@@ -1,3 +1,6 @@
+- [🇨🇳 简体中文](README.zh-CN.md)
+- [🇺🇸 English](README.md)
+
 # Synapulse
 
 **Synapulse** 连接您与行业前沿。
