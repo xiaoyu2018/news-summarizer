@@ -6,6 +6,7 @@ from email.mime.text import MIMEText
 from typing import Any
 
 from app.src.senders.base import Sender
+from app.src.utils.markdown_converter import convert_markdown
 
 
 class EmailSender(Sender):
@@ -72,29 +73,13 @@ class EmailSender(Sender):
             self.logger.exception(f"Failed to send email: {e}")
             return False
 
-    @staticmethod
-    def _convert_to_html(content: str) -> str:
-        """Convert plain text to simple HTML.
+    def _convert_to_html(self, content: str) -> str:
+        """Convert Markdown content to email-compatible HTML.
 
         Args:
-            content: Plain text content
+            content: Markdown content to convert
 
         Returns:
             HTML formatted content
         """
-        lines = content.split("\n")
-        html_lines = ['<html><body><pre style="font-family: Arial, sans-serif;">']
-
-        for line in lines:
-            if line.strip():
-                escaped = (
-                    line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-                )
-                if escaped.startswith("**") and escaped.endswith("**"):
-                    escaped = f"<strong>{escaped[2:-2]}</strong>"
-                html_lines.append(escaped)
-            else:
-                html_lines.append("<br>")
-
-        html_lines.append("</pre></body></html>")
-        return "\n".join(html_lines)
+        return convert_markdown(content)
