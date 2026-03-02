@@ -127,7 +127,7 @@ class EmailCollector(Collector):
         since_date = (datetime.now() - timedelta(days=self.time_range_days)).strftime(
             "%d-%b-%Y"
         )
-        return f'(UNSEEN SINCE "{since_date}")'
+        return f'(SINCE "{since_date}")'
 
     def _process_email(
         self, mail: imaplib.IMAP4_SSL, msg_id: bytes
@@ -150,25 +150,20 @@ class EmailCollector(Collector):
         msg = email.message_from_bytes(raw_email)
 
         subject = self._decode_header(msg.get("Subject", "No Subject"))
-        sender = self._extract_sender(msg)
+        source_name = self._extract_sender(msg)
         content = self._extract_content(msg)
-        timestamp = self._extract_timestamp(msg)
-        urls = self._extract_urls(content)
+        published_at = self._extract_timestamp(msg)
 
         if not content.strip():
             self.logger.debug(f"Skipping email with empty content: {subject}")
             return None
 
-        source_id = f"{self.email_account}:{msg_id.decode()}"
-
         return SourceItem(
             source_type="email",
-            source_id=source_id,
+            source_name=source_name,
             title=subject,
             content=content,
-            urls=urls,
-            timestamp=timestamp,
-            raw_data=None,
+            published_at=published_at,
         )
 
     @staticmethod
@@ -274,20 +269,3 @@ class EmailCollector(Collector):
             return parsedate_to_datetime(date_str)
         except (ValueError, TypeError):
             return None
-
-    def _extract_urls(self, content: str) -> list[str]:
-        """Extract URLs from content.
-
-        Args:
-            content: Text content
-
-        Returns:
-            List of URLs
-        """
-        import re
-
-        url_pattern = re.compile(
-            r"https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+[^\s]*",
-            re.IGNORECASE,
-        )
-        return list(set(url_pattern.findall(content)))[:5]

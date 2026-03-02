@@ -124,15 +124,8 @@ class AIProcessor(Processor):
         """
         combined = []
         for i, item in enumerate(items, 1):
-            source_info = f"来源: {item.source_type}"
-            if item.urls:
-                source_info += f" | 链接: {item.urls}"
-
             combined.append(
-                f"--- 新闻 {i} ---\n"
-                f"标题: {item.title}\n"
-                f"{source_info}\n"
-                f"内容: {item.content}"
+                f"--- 新闻 {i} ---\n{item.to_str()}"
             )
 
         return "\n\n".join(combined)
