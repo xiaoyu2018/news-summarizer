@@ -206,7 +206,7 @@ domains:
 
 ## TODO
 
-- [ ] 在 email_sender 中实现 md2html
+- [x] 在 email_sender 中实现 md2html
 - [ ] 优化 html_cleaner 和 email_collector 中的 _extract_content，以获得更好的结构化内容
 - [x] 优化 SourceItem 结构（移除 urls 部分），统一解析方式（to_str、to_dict...）
 - [x] 改进 tech.md 提示词，优化生成内容（分类总结、更好的信息展示）

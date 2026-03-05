@@ -14,7 +14,7 @@ domains:
         email_account: "${EMAIL1_ACCOUNT}"
         email_password: "${EMAIL1_PASSWORD}"
         mailbox: "INBOX"
-        mark_as_seen: true
+        mark_as_seen: false
         time_range_days: 1
     processor:
       type: ai
