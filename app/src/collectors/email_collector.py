@@ -222,7 +222,9 @@ class EmailCollector(Collector):
                     if payload:
                         charset = part.get_content_charset() or "utf-8"
                         try:
-                            content = cleaner.clean(payload.decode(charset, errors="ignore"))
+                            content = cleaner.clean(
+                                payload.decode(charset, errors="ignore")
+                            )
                             if content.strip():
                                 return content
                         except Exception:
@@ -236,7 +238,9 @@ class EmailCollector(Collector):
                     if payload:
                         charset = part.get_content_charset() or "utf-8"
                         try:
-                            content = cleaner.clean_simple(payload.decode(charset, errors="ignore"))
+                            content = cleaner.clean_simple(
+                                payload.decode(charset, errors="ignore")
+                            )
                             if content.strip():
                                 return content
                         except Exception:

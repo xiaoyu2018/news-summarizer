@@ -10,11 +10,23 @@ class HTMLCleaner:
 
     # Newsletter navigation/footer patterns to filter
     NEWSLETTER_FILTER_PATTERNS = [
-        r"unsubscribe", r"update.*preferences", r"manage.*preferences",
-        r"view.*online", r"view.*browser", r"read.*online",
-        r"follow.*on", r"facebook$", r"twitter$", r"linkedin$",
-        r"instagram$", r"youtube$", r"social media",
-        r"\d{4}.*LLC", r"all rights reserved", r"copyright", r"©",
+        r"unsubscribe",
+        r"update.*preferences",
+        r"manage.*preferences",
+        r"view.*online",
+        r"view.*browser",
+        r"read.*online",
+        r"follow.*on",
+        r"facebook$",
+        r"twitter$",
+        r"linkedin$",
+        r"instagram$",
+        r"youtube$",
+        r"social media",
+        r"\d{4}.*LLC",
+        r"all rights reserved",
+        r"copyright",
+        r"©",
     ]
 
     def __init__(self):
@@ -85,7 +97,9 @@ class HTMLCleaner:
         # Remove navigation/footer patterns (case-insensitive, whole line)
         for pattern in self.NEWSLETTER_FILTER_PATTERNS:
             # Match whole lines containing the pattern
-            text = re.sub(rf"^.*{pattern}.*$", "", text, flags=re.IGNORECASE | re.MULTILINE)
+            text = re.sub(
+                rf"^.*{pattern}.*$", "", text, flags=re.IGNORECASE | re.MULTILINE
+            )
 
         return text
 

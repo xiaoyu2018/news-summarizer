@@ -32,7 +32,9 @@ class SourceItem:
             "source_name": self.source_name,
             "source_title": self.source_title,
             "content": self.content,
-            "published_at": self.published_at.isoformat() if self.published_at else None,
+            "published_at": self.published_at.isoformat()
+            if self.published_at
+            else None,
             "metadata": self.metadata or {},
         }
 

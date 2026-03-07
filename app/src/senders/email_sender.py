@@ -25,9 +25,11 @@ class EmailSender(Sender):
         self.sender_email = config.get("sender_email", "")
         self.sender_password = config.get("sender_password", "")
         raw_receiver_email = config.get("receiver_email", "")
-        self.receiver_emails = [
-            email.strip() for email in raw_receiver_email.split(",")
-        ] if raw_receiver_email else []
+        self.receiver_emails = (
+            [email.strip() for email in raw_receiver_email.split(",")]
+            if raw_receiver_email
+            else []
+        )
         self.use_tls = config.get("use_tls", False)
 
     def send(self, content: str, subject: str) -> bool:

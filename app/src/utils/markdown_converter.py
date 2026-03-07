@@ -45,8 +45,8 @@ class MarkdownConverter:
             Styled HTML email content
         """
         styles = (
-            'font-family: Arial, sans-serif; font-size: 14px; '
-            'line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto;'
+            "font-family: Arial, sans-serif; font-size: 14px; "
+            "line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto;"
         )
 
         header_styles = {
