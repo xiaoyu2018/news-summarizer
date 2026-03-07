@@ -1,7 +1,6 @@
 """Markdown to HTML converter for email rendering."""
 
 import markdown
-from typing import Any
 
 
 class MarkdownConverter:
