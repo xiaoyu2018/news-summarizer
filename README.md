@@ -18,7 +18,7 @@
 - **Configuration-driven**: YAML config + Markdown prompts, separated from code
 - **Environment Variable Injection**: Sensitive info uses `${ENV_VAR_NAME}` placeholders for security
 
-## Project Structure·
+## Project Structure
 
 ```
 Synapulse/
@@ -206,9 +206,12 @@ If you find this project helpful, please scan to sponsor!
 
 ## TODO
 
-
-- [ ] md2html in email_sender
+- [ ] Add API interface, provide HTTP service
+- [ ] Add user management module, implement user registration, login, permission control, etc.
+- [ ] Add business database to store user configuration data
+- [ ] Add Poster module, implement multi-media platform publishing function
 - [ ] Optimize html_cleaner and _extract_content in email_collector, to get better structured content
+- [x] Implement md2html in email_sender, beautify email content
 - [x] Optimize SourceItem structure (remove urls part), unify parsing methods (to_str, to_dict...)
 - [x] Improve tech.md prompt, optimize generated content (categorized summary, better info display)
 - [x] Optimize logging pattern

@@ -206,8 +206,12 @@ domains:
 
 ## TODO
 
-- [x] 在 email_sender 中实现 md2html
+- [ ] 增加api接口，提供http服务
+- [ ] 增加用户管理模块，实现用户注册、登录、权限控制等
+- [ ] 增加业务数据库，存储用户配置数据
+- [ ] 增加Poster模块，实现多种自媒体平台发布功能
 - [ ] 优化 html_cleaner 和 email_collector 中的 _extract_content，以获得更好的结构化内容
+- [x] 在 email_sender 中实现 md2html，美化邮件内容
 - [x] 优化 SourceItem 结构（移除 urls 部分），统一解析方式（to_str、to_dict...）
 - [x] 改进 tech.md 提示词，优化生成内容（分类总结、更好的信息展示）
 - [x] 优化日志记录模式
