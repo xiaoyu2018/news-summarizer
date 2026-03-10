@@ -24,12 +24,7 @@ class AIProcessor(Processor):
         self.api_key = config.get("api_key", "")
         self.model = config.get("model", "gpt-4")
         self.prompt_file = config.get("prompt_file", "")
-        # AI model parameters
-        self.enable_thinking = config.get(
-            "enable_thinking",
-            True,
-        )  # Enable thinking mode for GLM-4.7
-        self.max_tokens = config.get("max_tokens", 131072)  # Max output tokens
+        self.max_tokens = config.get("max_tokens", 130000)  # Max output tokens
         self.temperature = config.get("temperature", 0)  # Control randomness (0-1)
         self._client: OpenAI | None = None
         self._prompt_template: str | None = None
@@ -77,10 +72,6 @@ class AIProcessor(Processor):
                 "temperature": self.temperature,
                 "max_tokens": self.max_tokens,
             }
-
-            # GLM-4.7 thinking mode requires extra_body parameter
-            if self.enable_thinking and self.provider.upper() == "ZHIPUAI":
-                api_params["extra_body"] = {"thinking": {"type": "enabled"}}
 
             response = self.client.chat.completions.create(**api_params)
 
